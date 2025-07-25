@@ -4,16 +4,34 @@ import path from "node:path";
 
 const port = 8080;
 const __dirname = import.meta.dirname;
+const notFoundPath = path.join(__dirname, "404.html");
+const routes = {
+  "/": path.join(__dirname, "index.html"),
+  "/about": path.join(__dirname, "about.html"),
+  "/contact-me": path.join(__dirname, "contact-me.html"),
+};
+
 const server = http.createServer((req, res) => {
-  if (req.url === "/") {
-    const indexPath = path.join(__dirname, "index.html");
-    res.writeHead(200, { "Content-Type": "text/html" });
-    fs.readFile(indexPath, (err, data) => {
+  const filePath = routes[req.url];
+  if (filePath) {
+    fs.readFile(filePath, (err, data) => {
       if (err) {
-        throw err;
-      } else {
-        res.end(data);
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        return res.end("500 Internal Server Error");
       }
+
+      res.writeHead(200, { "Content-Type": "text/html" });
+      return res.end(data);
+    });
+  } else {
+    fs.readFile(notFoundPath, (err, data) => {
+      if (err) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        return res.end("500 Internal Server Error");
+      }
+
+      res.writeHead(404, { "Content-Type": "text/html" });
+      return res.end(data);
     });
   }
 });
@@ -25,7 +43,3 @@ server.listen(port, (err) => {
     console.log("Server listening on port " + port);
   }
 });
-// Create server
-// If req url matches, return html file
-// Else, return 404 error file
-// Server listen on 8080 port
