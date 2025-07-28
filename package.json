@@ -8,5 +8,8 @@
     "@eslint/js": "^9.24.0",
     "eslint": "^9.31.0",
     "prettier": "^3.6.2"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
   }
 }
